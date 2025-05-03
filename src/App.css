@@ -32,6 +32,7 @@
     animation: logo-spin infinite 20s linear;
   }
 }
+
 .background-container {
   position: fixed;
   top: 0;
@@ -49,11 +50,76 @@
   opacity: 0.2;
 }
 
-
 .card {
   padding: 2em;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
 }
 
+.subtitle {
+  font-weight: 300;
+  font-size: 1.1rem;
+  color: #777;
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+}
+
+.price-input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 215px;
+  text-align: center;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  max-width: 300px;
+}
+
+.buy-button,
+.sell-button {
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 1;
+  margin: 0 0.5rem;
+}
+
+.buy-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.sell-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.stock-dropdown {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 230px;
+}
+.currency-dropdown {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 230px;
+}
 .read-the-docs {
   color: #888;
 }
