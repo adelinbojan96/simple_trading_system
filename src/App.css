@@ -66,7 +66,7 @@
   margin-bottom: 1.5rem;
 }
 
-.price-input {
+.price-input, .user-id-input{
   padding: 0.5rem;
   font-size: 1rem;
   border: 1px solid #ccc;
@@ -75,7 +75,6 @@
   max-width: 215px;
   text-align: center;
 }
-
 .button-group {
   display: flex;
   justify-content: space-evenly;
@@ -119,6 +118,31 @@
   border: 1px solid #ccc;
   width: 100%;
   max-width: 230px;
+}
+.cancel-button {
+  background-color: brown;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.order-list {
+  list-style: none;
+  padding: 0;
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.order-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
 }
 .read-the-docs {
   color: #888;
