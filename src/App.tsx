@@ -1,4 +1,4 @@
-import { useState, useEffect, JSX } from 'react'
+import { useState, JSX } from 'react'
 import './App.css'
 import stockImage from './assets/stock_image.png'
 import axios from 'axios'
@@ -6,12 +6,14 @@ import axios from 'axios'
 interface Order {
     stock: string
     price: number
+    currency: string
 }
 
 interface Orders {
     buy: Record<string, Order>
     sell: Record<string, Order>
     cancelled: string[]
+    trades: string[]
 }
 
 export default function App(): JSX.Element {
@@ -19,7 +21,7 @@ export default function App(): JSX.Element {
     const [price, setPrice] = useState<string>('')
     const [stock, setStock] = useState<string>('AAPL')
     const [currency, setCurrency] = useState<string>('$')
-    const [orders, setOrders] = useState<Orders>({ buy: {}, sell: {}, cancelled: [] })
+    const [orders, setOrders] = useState<Orders>({ buy: {}, sell: {}, cancelled: [], trades: []})
 
     const fetchState = async (): Promise<void> => {
         try {
@@ -31,10 +33,6 @@ export default function App(): JSX.Element {
             console.error('Failed to fetch state:', err)
         }
     }
-
-    useEffect(() => {
-        fetchState()
-    }, [userId])
 
     const handleBuy = async (): Promise<void> => {
         try {
@@ -85,6 +83,17 @@ export default function App(): JSX.Element {
         const a = document.createElement('a')
         a.href = url
         a.download = 'cancelled_orders.json'
+        a.click()
+        URL.revokeObjectURL(url)
+    }
+
+    const downloadSuccessfulOrders = (): void => {
+        const data = JSON.stringify(orders.trades, null, 2)
+        const blob = new Blob([data], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'trades.json'
         a.click()
         URL.revokeObjectURL(url)
     }
@@ -146,7 +155,7 @@ export default function App(): JSX.Element {
                 <ul className="order-list">
                     {Object.entries(orders.buy).map(([id, order]) => (
                         <li key={id}>
-                            {order.stock} @ {order.price}{currency}
+                            {order.stock} @ {order.price}{order.currency} (Buy)
                             <button className="cancel-button" onClick={() => handleCancel(id)}>
                                 Cancel
                             </button>
@@ -154,7 +163,7 @@ export default function App(): JSX.Element {
                     ))}
                     {Object.entries(orders.sell).map(([id, order]) => (
                         <li key={id}>
-                            {order.stock} @ {order.price}{currency} (Sell)
+                            {order.stock} @ {order.price}{order.currency} (Sell)
                             <button className="cancel-button" onClick={() => handleCancel(id)}>
                                 Cancel
                             </button>
@@ -165,6 +174,11 @@ export default function App(): JSX.Element {
                 <h3>Cancelled Orders</h3>
                 <button className="cancel-button" onClick={downloadCancelledOrders}>
                     Download Cancelled Orders
+                </button>
+
+                <h4>Successful Trades</h4>
+                <button className="success-button" onClick={downloadSuccessfulOrders}>
+                    Download Successful Trades
                 </button>
             </div>
         </>

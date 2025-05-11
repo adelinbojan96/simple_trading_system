@@ -119,8 +119,7 @@
   width: 100%;
   max-width: 230px;
 }
-.cancel-button {
-  background-color: brown;
+.cancel-button, .success-button {
   color: white;
   border: none;
   padding: 0.3rem 0.8rem;
@@ -128,7 +127,12 @@
   margin-left: 0.5rem;
   cursor: pointer;
 }
-
+.cancel-button {
+  background-color: brown;
+}
+.success-button {
+    background-color: green;
+}
 .order-list {
   list-style: none;
   padding: 0;

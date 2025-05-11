@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .event_store import append_event, get_all_events
 from .events import *
 from .aggregates.order_book import *
-from .aggregates.account import Account
+from .aggregates.account import *
 
 @csrf_exempt
 def place_order(request):
@@ -14,22 +14,25 @@ def place_order(request):
         side     = data['side']
         price    = data['price']
         stock    = data['stock']
+        currency = data['currency']
+
         order_id = str(uuid.uuid4())
 
         events     = get_all_events()
         ob         = OrderBook().replay(events)
 
-        append_event(order_placed(order_id, user, side, price, stock))
+        buyer_acct = Account(user).replay(get_all_events())
+        if side == 'buy' and buyer_acct.balance < price:
+            return JsonResponse({'error': 'Insufficient funds for trade'}, status=400)
+
+        append_event(order_placed(order_id, user, side, price, stock, currency))
 
         # match one share
         counter = ob.sell if side=='buy' else ob.buy
         for co_id, co in counter.items():
-            if co['stock']==stock and co['price']==price:
+            if co['stock'] == stock and co['price'] == price and co['currency'] == currency:
 
                 print(f"Matched: {order_id} with {co_id}")
-                # delete the matching orders
-                append_event(order_cancelled(order_id, user))
-                append_event(order_cancelled(co_id, co['user_id']))
 
                 trade_id = str(uuid.uuid4())
                 buy_id   = order_id if side=='buy'  else co_id
@@ -37,17 +40,23 @@ def place_order(request):
                 buy_user = user      if side=='buy'  else co['user_id']
                 sell_user= co['user_id'] if side=='buy' else user
 
+                # update amounts
+                append_event(funds_debited(buy_user,  price))
+                append_event(funds_credited(sell_user, price))
+
+                # delete the matching orders and append the trade event
                 append_event(trade_executed(
                     trade_id, buy_id, sell_id,
                     buy_user, sell_user,
                     price,
                     stock,
+                    currency
                 ))
 
-                append_event(funds_debited(buy_user,  price))
-                append_event(funds_credited(sell_user, price))
-                append_event(shares_debited(sell_user, stock, 1))
-                append_event(shares_credited(buy_user,  stock, 1))
+                buyer_acct = Account(buy_user).replay(get_all_events())
+                seller_acct = Account(sell_user).replay(get_all_events())
+                print(f"{buy_user} balance:   {buyer_acct.balance}{currency}")
+                print(f"{sell_user} balance:  {seller_acct.balance}{currency}")
                 break
 
 
